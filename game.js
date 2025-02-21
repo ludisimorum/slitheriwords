@@ -53,9 +53,11 @@ class WordBox {
             ctx.fillStyle = '#D2B48C'; // Light brown color
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = 'black';
-            ctx.font = '20px Arial';
+            // Font doubled from 20px to 40px
+            ctx.font = '40px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 7);
+            // Adjust vertical alignment for the larger font
+            ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 14);
         }
     }
 
@@ -124,17 +126,28 @@ class Game {
 
     createRandomBoxes() {
         const boxes = [];
+        // Shuffle words
         const shuffledWords = [...this.words].sort(() => Math.random() - 0.5);
-        const minDistance = 120; // Minimum distance between boxes
+        
+        // Define horizontal positioning similar to before
+        const tryX = () => 50 + Math.random() * (this.canvas.width - 180);
+        let minY = 50;
+        let maxY;
+        // If on mobile, restrict the vertical range so boxes are above the control panel.
+        if (this.isMobileDevice()) {
+            // Control panel occupies roughly the bottom 150 pixels; also subtract box height (40)
+            maxY = this.canvas.height - 150 - 40;
+        } else {
+            maxY = this.canvas.height - 40;
+        }
+        const tryY = () => minY + Math.random() * (maxY - minY);
 
         const tryPosition = () => {
-            return {
-                x: 50 + Math.random() * (this.canvas.width - 180),
-                y: 50 + Math.random() * (this.canvas.height - 140)
-            };
+            return { x: tryX(), y: tryY() };
         };
 
         const isTooClose = (pos, existingBoxes) => {
+            const minDistance = 120; // Minimum distance between boxes
             return existingBoxes.some(box => {
                 const distance = Math.sqrt(
                     Math.pow(pos.x - box.x, 2) + 
@@ -306,7 +319,8 @@ class Game {
         
         if (!this.gameStarted || this.gameOver) {
             this.ctx.fillStyle = 'black';
-            this.ctx.font = 'bold 28px Arial';
+            // Sentence font doubled from bold 28px to bold 56px
+            this.ctx.font = 'bold 56px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, 100);
             
@@ -321,7 +335,8 @@ class Game {
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
             this.ctx.fillStyle = 'green';
-            this.ctx.font = '48px Arial';
+            // "You Won!" font doubled from 48px to 96px
+            this.ctx.font = '96px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText('You Won!', this.canvas.width / 2, this.canvas.height / 2);
             
@@ -339,8 +354,9 @@ class Game {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(x - width / 2, y - height / 2, width, height);
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText(text, x, y + 7);
+        // Button font doubled from 20px to 40px
+        this.ctx.font = '40px Arial';
+        this.ctx.fillText(text, x, y + 14);
     }
 
     drawTouchControls() {
@@ -408,7 +424,7 @@ class Game {
                     
                     const currentSegments = [...this.snake.segments];
                     currentSegments.forEach(segment => {
-                        this.snake.segments.push({...segment});
+                        this.snake.segments.push({ ...segment });
                     });
                     
                     if (this.currentWordIndex >= this.words.length) {
