@@ -50,7 +50,7 @@ class WordBox {
 
     draw(ctx) {
         if (!this.isCollected) {
-            ctx.fillStyle = 'yellow';
+            ctx.fillStyle = 'lightbrown'; // Changed color to light brown
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = 'black';
             ctx.font = '20px Arial';
