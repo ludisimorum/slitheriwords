@@ -4,7 +4,8 @@ class Snake {
             {x: 300, y: 200},
             {x: 280, y: 200}
         ];
-        this.direction = {x: 1, y: 0};
+        // Initially, the snake is stationary
+        this.direction = {x: 0, y: 0};
         this.size = 20;
         this.baseSpeed = 0.75;
         this.speed = this.baseSpeed;
@@ -89,8 +90,11 @@ class Game {
         this.words = this.sentences[this.currentSentenceIndex];
         this.gameOver = false;
         this.won = false;
+        // Flag to indicate when the snake has started moving
+        this.gameActive = false;
         this.boxes = this.createRandomBoxes();
-        this.gameStarted = false;  // Flag to track if game has started
+        // The game has been initiated but not yet active (snake is stationary)
+        this.gameStarted = false;  
 
         // Initialize touchButtons with default values; they will be updated in resizeCanvas if on mobile.
         this.touchButtons = {
@@ -178,6 +182,10 @@ class Game {
 
     setupControls() {
         document.addEventListener('keydown', (e) => {
+            // Only start the game movement if an arrow key is pressed
+            if (!this.gameActive && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                this.gameActive = true;
+            }
             switch (e.key) {
                 case 'ArrowUp':
                     this.snake.direction = { x: 0, y: -1 };
@@ -263,6 +271,11 @@ class Game {
             const touch = e.touches[0];
             const x = touch.clientX - rect.left;
             const y = touch.clientY - rect.top;
+
+            // If game is not active, any control tap should start the movement
+            if (!this.gameActive) {
+                this.gameActive = true;
+            }
 
             // Check Let's go! and Next buttons
             if (!this.gameStarted || this.gameOver) {
@@ -366,7 +379,6 @@ class Game {
 
     drawTouchControls() {
         // Draw direction buttons at the bottom of the screen.
-        // We'll use proportional coordinates to draw nice, scaled arrow triangles.
         this.ctx.fillStyle = 'rgba(0, 0, 255, 0.3)';
 
         // Up arrow
@@ -408,18 +420,24 @@ class Game {
 
     startGame() {
         this.gameStarted = true;
+        // When a game starts, the snake remains stationary until a control is pressed.
+        this.gameActive = false;
         this.gameOver = false;
         this.currentWordIndex = 0;
         this.snake = new Snake();
+        // Ensure snake remains stationary initially.
+        this.snake.direction = { x: 0, y: 0 };
         this.boxes = this.createRandomBoxes();
     }
 
     reset() {
         this.gameStarted = false;
+        this.gameActive = false;
         this.currentWordIndex = 0;
         this.gameOver = false;
         this.won = false;
         this.snake = new Snake();
+        this.snake.direction = { x: 0, y: 0 };
         this.boxes = this.createRandomBoxes();
     }
 
@@ -457,7 +475,8 @@ class Game {
     }
 
     gameLoop() {
-        if (this.gameStarted && !this.gameOver && !this.won) {
+        // Only move the snake if the game is active (a control has been tapped)
+        if (this.gameStarted && this.gameActive && !this.gameOver && !this.won) {
             this.snake.move();
             this.checkCollisions();
         }
