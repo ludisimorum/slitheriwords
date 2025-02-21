@@ -73,6 +73,9 @@ class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
+
         this.snake = new Snake();
         this.sentences = [
             ['I', 'can', 'ride', 'a', 'horse.'],
@@ -96,6 +99,11 @@ class Game {
         this.setupTouchControls();
         this.setupControls();
         this.gameLoop();
+    }
+
+    resizeCanvas() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
     }
 
     createRandomBoxes() {
@@ -414,4 +422,4 @@ class Game {
 }
 
 // Start the game
-new Game(); 
+new Game();
