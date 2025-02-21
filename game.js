@@ -94,10 +94,10 @@ class Game {
 
         // Initialize touchButtons with default values; they will be updated in resizeCanvas if on mobile.
         this.touchButtons = {
-            up: { x: 0, y: 0, width: 40, height: 40 },
-            down: { x: 0, y: 0, width: 40, height: 40 },
-            left: { x: 0, y: 0, width: 40, height: 40 },
-            right: { x: 0, y: 0, width: 40, height: 40 }
+            up: { x: 0, y: 0, width: 60, height: 60 },
+            down: { x: 0, y: 0, width: 60, height: 60 },
+            left: { x: 0, y: 0, width: 60, height: 60 },
+            right: { x: 0, y: 0, width: 60, height: 60 }
         };
 
         this.setupTouchControls();
@@ -113,13 +113,18 @@ class Game {
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        // Update touch buttons positions if on mobile (moved up by 10 pixels)
+        // Update touch buttons positions if on mobile.
         if (this.isMobileDevice()) {
+            // Using the same center positions as before but adjusting for the larger 60x60 size.
             this.touchButtons = {
-                up: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 110, width: 40, height: 40 },
-                down: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 50, width: 40, height: 40 },
-                left: { x: this.canvas.width / 2 - 80, y: this.canvas.height - 80, width: 40, height: 40 },
-                right: { x: this.canvas.width / 2 + 40, y: this.canvas.height - 80, width: 40, height: 40 }
+                // Up arrow: centered at (canvas.width/2, canvas.height - 90)
+                up: { x: this.canvas.width / 2 - 30, y: this.canvas.height - 90 - 30, width: 60, height: 60 },
+                // Down arrow: centered at (canvas.width/2, canvas.height - 30)
+                down: { x: this.canvas.width / 2 - 30, y: this.canvas.height - 30 - 30, width: 60, height: 60 },
+                // Left arrow: centered at (canvas.width/2 - 60, canvas.height - 60)
+                left: { x: this.canvas.width / 2 - 60 - 30, y: this.canvas.height - 60 - 30, width: 60, height: 60 },
+                // Right arrow: centered at (canvas.width/2 + 60, canvas.height - 60)
+                right: { x: this.canvas.width / 2 + 60 - 30, y: this.canvas.height - 60 - 30, width: 60, height: 60 }
             };
         }
     }
@@ -135,7 +140,7 @@ class Game {
         let maxY;
         // If on mobile, restrict the vertical range so boxes are above the control panel.
         if (this.isMobileDevice()) {
-            // Control panel occupies roughly the bottom 150 pixels; also subtract box height (40)
+            // Reserve roughly the bottom 150 pixels for controls (plus the box height of 40)
             maxY = this.canvas.height - 150 - 40;
         } else {
             maxY = this.canvas.height - 40;
@@ -360,39 +365,44 @@ class Game {
     }
 
     drawTouchControls() {
-        // Draw direction buttons at the bottom of the screen
+        // Draw direction buttons at the bottom of the screen.
+        // We'll use proportional coordinates to draw nice, scaled arrow triangles.
         this.ctx.fillStyle = 'rgba(0, 0, 255, 0.3)';
-        
+
         // Up arrow
+        let btn = this.touchButtons.up;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.touchButtons.up.x + 20, this.touchButtons.up.y + 30);
-        this.ctx.lineTo(this.touchButtons.up.x + 40, this.touchButtons.up.y + 30);
-        this.ctx.lineTo(this.touchButtons.up.x + 20, this.touchButtons.up.y + 10);
-        this.ctx.lineTo(this.touchButtons.up.x, this.touchButtons.up.y + 30);
+        this.ctx.moveTo(btn.x + btn.width * 0.25, btn.y + btn.height * 0.65);
+        this.ctx.lineTo(btn.x + btn.width * 0.75, btn.y + btn.height * 0.65);
+        this.ctx.lineTo(btn.x + btn.width / 2, btn.y + btn.height * 0.35);
+        this.ctx.closePath();
         this.ctx.fill();
 
         // Down arrow
+        btn = this.touchButtons.down;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.touchButtons.down.x + 20, this.touchButtons.down.y + 10);
-        this.ctx.lineTo(this.touchButtons.down.x + 40, this.touchButtons.down.y + 10);
-        this.ctx.lineTo(this.touchButtons.down.x + 20, this.touchButtons.down.y + 30);
-        this.ctx.lineTo(this.touchButtons.down.x, this.touchButtons.down.y + 10);
+        this.ctx.moveTo(btn.x + btn.width * 0.25, btn.y + btn.height * 0.35);
+        this.ctx.lineTo(btn.x + btn.width * 0.75, btn.y + btn.height * 0.35);
+        this.ctx.lineTo(btn.x + btn.width / 2, btn.y + btn.height * 0.65);
+        this.ctx.closePath();
         this.ctx.fill();
 
         // Left arrow
+        btn = this.touchButtons.left;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.touchButtons.left.x + 30, this.touchButtons.left.y + 20);
-        this.ctx.lineTo(this.touchButtons.left.x + 30, this.touchButtons.left.y + 40);
-        this.ctx.lineTo(this.touchButtons.left.x + 10, this.touchButtons.left.y + 20);
-        this.ctx.lineTo(this.touchButtons.left.x + 30, this.touchButtons.left.y);
+        this.ctx.moveTo(btn.x + btn.width * 0.65, btn.y + btn.height * 0.25);
+        this.ctx.lineTo(btn.x + btn.width * 0.65, btn.y + btn.height * 0.75);
+        this.ctx.lineTo(btn.x + btn.width * 0.35, btn.y + btn.height / 2);
+        this.ctx.closePath();
         this.ctx.fill();
 
         // Right arrow
+        btn = this.touchButtons.right;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.touchButtons.right.x + 10, this.touchButtons.right.y + 20);
-        this.ctx.lineTo(this.touchButtons.right.x + 10, this.touchButtons.right.y + 40);
-        this.ctx.lineTo(this.touchButtons.right.x + 30, this.touchButtons.right.y + 20);
-        this.ctx.lineTo(this.touchButtons.right.x + 10, this.touchButtons.right.y);
+        this.ctx.moveTo(btn.x + btn.width * 0.35, btn.y + btn.height * 0.25);
+        this.ctx.lineTo(btn.x + btn.width * 0.35, btn.y + btn.height * 0.75);
+        this.ctx.lineTo(btn.x + btn.width * 0.65, btn.y + btn.height / 2);
+        this.ctx.closePath();
         this.ctx.fill();
     }
 
