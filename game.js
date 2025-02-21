@@ -31,7 +31,7 @@ class Snake {
         const head = this.segments[0];
         if (this.isSmiling) {
             ctx.beginPath();
-            ctx.arc(head.x + this.size/2, head.y + this.size/2, 8, 0, Math.PI, false);
+            ctx.arc(head.x + this.size / 2, head.y + this.size / 2, 8, 0, Math.PI, false);
             ctx.strokeStyle = 'black';
             ctx.stroke();
         }
@@ -50,12 +50,12 @@ class WordBox {
 
     draw(ctx) {
         if (!this.isCollected) {
-            ctx.fillStyle = 'lightbrown'; // Changed color to light brown
+            ctx.fillStyle = '#D2B48C'; // Light brown color
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = 'black';
             ctx.font = '20px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(this.word, this.x + this.width/2, this.y + this.height/2 + 7);
+            ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 7);
         }
     }
 
@@ -144,21 +144,21 @@ class Game {
 
     setupControls() {
         document.addEventListener('keydown', (e) => {
-            switch(e.key) {
+            switch (e.key) {
                 case 'ArrowUp':
-                    this.snake.direction = {x: 0, y: -1};
+                    this.snake.direction = { x: 0, y: -1 };
                     this.snake.speed = this.snake.baseSpeed * 3;
                     break;
                 case 'ArrowDown':
-                    this.snake.direction = {x: 0, y: 1};
+                    this.snake.direction = { x: 0, y: 1 };
                     this.snake.speed = this.snake.baseSpeed * 3;
                     break;
                 case 'ArrowLeft':
-                    this.snake.direction = {x: -1, y: 0};
+                    this.snake.direction = { x: -1, y: 0 };
                     this.snake.speed = this.snake.baseSpeed * 3;
                     break;
                 case 'ArrowRight':
-                    this.snake.direction = {x: 1, y: 0};
+                    this.snake.direction = { x: 1, y: 0 };
                     this.snake.speed = this.snake.baseSpeed * 3;
                     break;
                 case 'Enter':
@@ -196,13 +196,13 @@ class Game {
                 
                 if ((!this.gameStarted || this.gameOver) && 
                     y > 180 && y < 220 && 
-                    x > this.canvas.width/2 - 60 && x < this.canvas.width/2 + 60) {
+                    x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
                     this.startGame();
                 }
                 
                 if (this.won) {
-                    if (y > this.canvas.height/2 + 40 && y < this.canvas.height/2 + 80 &&
-                        x > this.canvas.width/2 - 60 && x < this.canvas.width/2 + 60) {
+                    if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
+                        x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
                         if (this.currentSentenceIndex < this.sentences.length - 1) {
                             this.currentSentenceIndex++;
                             this.words = this.sentences[this.currentSentenceIndex];
@@ -229,14 +229,14 @@ class Game {
 
             // Check Let's go! and Next buttons
             if (!this.gameStarted || this.gameOver) {
-                if (y > 180 && y < 220 && x > this.canvas.width/2 - 60 && x < this.canvas.width/2 + 60) {
+                if (y > 180 && y < 220 && x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
                     this.startGame();
                 }
             }
             
             if (this.won) {
-                if (y > this.canvas.height/2 + 40 && y < this.canvas.height/2 + 80 &&
-                    x > this.canvas.width/2 - 60 && x < this.canvas.width/2 + 60) {
+                if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
+                    x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
                     if (this.currentSentenceIndex < this.sentences.length - 1) {
                         this.currentSentenceIndex++;
                         this.words = this.sentences[this.currentSentenceIndex];
@@ -252,19 +252,19 @@ class Game {
             // Check direction buttons
             if (this.gameStarted && !this.gameOver && !this.won) {
                 if (this.isPointInButton(x, y, this.touchButtons.up)) {
-                    this.snake.direction = {x: 0, y: -1};
+                    this.snake.direction = { x: 0, y: -1 };
                     this.snake.speed = this.snake.baseSpeed * 3;
                 }
                 if (this.isPointInButton(x, y, this.touchButtons.down)) {
-                    this.snake.direction = {x: 0, y: 1};
+                    this.snake.direction = { x: 0, y: 1 };
                     this.snake.speed = this.snake.baseSpeed * 3;
                 }
                 if (this.isPointInButton(x, y, this.touchButtons.left)) {
-                    this.snake.direction = {x: -1, y: 0};
+                    this.snake.direction = { x: -1, y: 0 };
                     this.snake.speed = this.snake.baseSpeed * 3;
                 }
                 if (this.isPointInButton(x, y, this.touchButtons.right)) {
-                    this.snake.direction = {x: 1, y: 0};
+                    this.snake.direction = { x: 1, y: 0 };
                     this.snake.speed = this.snake.baseSpeed * 3;
                 }
             }
@@ -289,9 +289,9 @@ class Game {
             this.ctx.fillStyle = 'black';
             this.ctx.font = 'bold 28px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText(this.words.join(' '), this.canvas.width/2, 100);
+            this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, 100);
             
-            this.drawButton("Let's go!", this.canvas.width/2, 200, 120, 40, 'blue');
+            this.drawButton("Let's go!", this.canvas.width / 2, 200, 120, 40, 'blue');
         } else {
             this.boxes.forEach(box => box.draw(this.ctx));
             this.snake.draw(this.ctx);
@@ -304,10 +304,10 @@ class Game {
             this.ctx.fillStyle = 'green';
             this.ctx.font = '48px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText('You Won!', this.canvas.width/2, this.canvas.height/2);
+            this.ctx.fillText('You Won!', this.canvas.width / 2, this.canvas.height / 2);
             
             const buttonText = this.currentSentenceIndex < this.sentences.length - 1 ? 'Next?' : 'Play Again';
-            this.drawButton(buttonText, this.canvas.width/2, this.canvas.height/2 + 60, 120, 40, 'blue');
+            this.drawButton(buttonText, this.canvas.width / 2, this.canvas.height / 2 + 60, 120, 40, 'blue');
         }
 
         // Draw touch controls if game is active
@@ -318,7 +318,7 @@ class Game {
 
     drawButton(text, x, y, width, height, color) {
         this.ctx.fillStyle = color;
-        this.ctx.fillRect(x - width/2, y - height/2, width, height);
+        this.ctx.fillRect(x - width / 2, y - height / 2, width, height);
         this.ctx.fillStyle = 'white';
         this.ctx.font = '20px Arial';
         this.ctx.fillText(text, x, y + 7);
