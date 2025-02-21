@@ -51,11 +51,11 @@ class WordBox {
             ctx.fillStyle = '#D2B48C'; // Light brown color
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = 'black';
-            // Use a moderate font size (20px Arial)
-            ctx.font = '20px Arial';
+            // Reduced font size for smartphone
+            ctx.font = '16px Arial';
             ctx.textAlign = 'center';
             // Adjust vertical alignment for the font size
-            ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 7);
+            ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 6);
         }
     }
 
@@ -114,13 +114,13 @@ class Game {
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        // Update touch buttons positions if on mobile
+        // Update touch buttons positions if on mobile; reserve bottom 150px for controls.
         if (this.isMobileDevice()) {
             this.touchButtons = {
-                up: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 100, width: 40, height: 40 },
-                down: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 40, width: 40, height: 40 },
-                left: { x: this.canvas.width / 2 - 80, y: this.canvas.height - 70, width: 40, height: 40 },
-                right: { x: this.canvas.width / 2 + 40, y: this.canvas.height - 70, width: 40, height: 40 }
+                up: { x: this.canvas.width / 2 - 30, y: this.canvas.height - 120, width: 60, height: 60 },
+                down: { x: this.canvas.width / 2 - 30, y: this.canvas.height - 60, width: 60, height: 60 },
+                left: { x: this.canvas.width / 2 - 90, y: this.canvas.height - 90, width: 60, height: 60 },
+                right: { x: this.canvas.width / 2 + 30, y: this.canvas.height - 90, width: 60, height: 60 }
             };
         }
     }
@@ -212,6 +212,7 @@ class Game {
                 const rect = this.canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
+                // Ensure text elements (like start button) are above the control panel area.
                 if ((!this.gameStarted || this.gameOver) &&
                     y > 180 && y < 220 &&
                     x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
@@ -303,8 +304,8 @@ class Game {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (!this.gameStarted || this.gameOver) {
             this.ctx.fillStyle = 'black';
-            // Use moderate starting sentence font size
-            this.ctx.font = 'bold 28px Arial';
+            // Reduced starting message font size for smartphones
+            this.ctx.font = 'bold 20px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, 100);
             this.drawButton("Let's go!", this.canvas.width / 2, 200, 120, 40, 'blue');
@@ -316,8 +317,8 @@ class Game {
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = 'green';
-            // Use a moderate win message font size
-            this.ctx.font = '48px Arial';
+            // Reduced win message font size
+            this.ctx.font = '28px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText('You Won!', this.canvas.width / 2, this.canvas.height / 2);
             const buttonText = this.currentSentenceIndex < this.sentences.length - 1 ? 'Next?' : 'Play Again';
@@ -332,13 +333,15 @@ class Game {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(x - width / 2, y - height / 2, width, height);
         this.ctx.fillStyle = 'white';
-        // Use moderate button font size
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText(text, x, y + 7);
+        // Reduced button font size
+        this.ctx.font = '16px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText(text, x, y + 6);
     }
 
     drawTouchControls() {
         this.ctx.fillStyle = 'rgba(0, 0, 255, 0.3)';
+        // Draw large control buttons at the bottom of the screen
         // Up arrow
         let btn = this.touchButtons.up;
         this.ctx.beginPath();
