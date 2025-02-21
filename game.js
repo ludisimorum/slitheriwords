@@ -212,23 +212,52 @@ class Game {
                 const rect = this.canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                // Ensure text elements (like start button) are above the control panel area.
-                if ((!this.gameStarted || this.gameOver) &&
-                    y > 180 && y < 220 &&
-                    x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                    this.startGame();
+                // Adjust start button hit area based on device type.
+                if (!this.gameStarted || this.gameOver) {
+                    if (this.isMobileDevice()) {
+                        const reservedArea = 150;
+                        const availableHeight = this.canvas.height - reservedArea;
+                        const buttonY = availableHeight / 2 + 20;
+                        if (y > buttonY - 20 && y < buttonY + 20 &&
+                            x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
+                            this.startGame();
+                        }
+                    } else {
+                        if (y > 180 && y < 220 &&
+                            x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
+                            this.startGame();
+                        }
+                    }
                 }
                 if (this.won) {
-                    if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
-                        x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                        if (this.currentSentenceIndex < this.sentences.length - 1) {
-                            this.currentSentenceIndex++;
-                            this.words = this.sentences[this.currentSentenceIndex];
-                            this.reset();
-                        } else {
-                            this.currentSentenceIndex = 0;
-                            this.words = this.sentences[this.currentSentenceIndex];
-                            this.reset();
+                    if (this.isMobileDevice()) {
+                        const reservedArea = 150;
+                        const availableHeight = this.canvas.height - reservedArea;
+                        const buttonY = availableHeight / 2 + 20;
+                        if (y > buttonY - 20 && y < buttonY + 20 &&
+                            x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
+                            if (this.currentSentenceIndex < this.sentences.length - 1) {
+                                this.currentSentenceIndex++;
+                                this.words = this.sentences[this.currentSentenceIndex];
+                                this.reset();
+                            } else {
+                                this.currentSentenceIndex = 0;
+                                this.words = this.sentences[this.currentSentenceIndex];
+                                this.reset();
+                            }
+                        }
+                    } else {
+                        if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
+                            x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
+                            if (this.currentSentenceIndex < this.sentences.length - 1) {
+                                this.currentSentenceIndex++;
+                                this.words = this.sentences[this.currentSentenceIndex];
+                                this.reset();
+                            } else {
+                                this.currentSentenceIndex = 0;
+                                this.words = this.sentences[this.currentSentenceIndex];
+                                this.reset();
+                            }
                         }
                     }
                 }
@@ -250,13 +279,20 @@ class Game {
                 this.gameActive = true;
             }
             if (!this.gameStarted || this.gameOver) {
-                if (y > 180 && y < 220 &&
+                const reservedArea = 150;
+                const availableHeight = this.canvas.height - reservedArea;
+                const buttonY = availableHeight / 2 + 20;
+                if (y > buttonY - 20 && y < buttonY + 20 &&
                     x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
                     this.startGame();
+                    return;
                 }
             }
             if (this.won) {
-                if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
+                const reservedArea = 150;
+                const availableHeight = this.canvas.height - reservedArea;
+                const buttonY = availableHeight / 2 + 20;
+                if (y > buttonY - 20 && y < buttonY + 20 &&
                     x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
                     if (this.currentSentenceIndex < this.sentences.length - 1) {
                         this.currentSentenceIndex++;
@@ -267,6 +303,7 @@ class Game {
                         this.words = this.sentences[this.currentSentenceIndex];
                         this.reset();
                     }
+                    return;
                 }
             }
             if (this.gameStarted && !this.gameOver && !this.won) {
@@ -307,8 +344,17 @@ class Game {
             // Reduced starting message font size for smartphones
             this.ctx.font = 'bold 20px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, 100);
-            this.drawButton("Let's go!", this.canvas.width / 2, 200, 120, 40, 'blue');
+            let messageY = 100;
+            let buttonY = 200;
+            // On mobile, ensure text is above the bottom control panel (reserved 150px)
+            if (this.isMobileDevice()) {
+                const reservedArea = 150;
+                const availableHeight = this.canvas.height - reservedArea;
+                messageY = availableHeight / 2 - 20;
+                buttonY = availableHeight / 2 + 20;
+            }
+            this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, messageY);
+            this.drawButton("Let's go!", this.canvas.width / 2, buttonY, 120, 40, 'blue');
         } else {
             this.boxes.forEach(box => box.draw(this.ctx));
             this.snake.draw(this.ctx);
@@ -320,9 +366,18 @@ class Game {
             // Reduced win message font size
             this.ctx.font = '28px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText('You Won!', this.canvas.width / 2, this.canvas.height / 2);
+            let messageY = this.canvas.height / 2;
+            let buttonY = this.canvas.height / 2 + 60;
+            // On mobile, draw win message above the reserved control panel
+            if (this.isMobileDevice()) {
+                const reservedArea = 150;
+                const availableHeight = this.canvas.height - reservedArea;
+                messageY = availableHeight / 2 - 20;
+                buttonY = availableHeight / 2 + 20;
+            }
+            this.ctx.fillText('You Won!', this.canvas.width / 2, messageY);
             const buttonText = this.currentSentenceIndex < this.sentences.length - 1 ? 'Next?' : 'Play Again';
-            this.drawButton(buttonText, this.canvas.width / 2, this.canvas.height / 2 + 60, 120, 40, 'blue');
+            this.drawButton(buttonText, this.canvas.width / 2, buttonY, 120, 40, 'blue');
         }
         if (this.gameStarted && !this.gameOver && !this.won && this.isMobileDevice()) {
             this.drawTouchControls();
