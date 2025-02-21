@@ -4,7 +4,6 @@ class Snake {
             {x: 300, y: 200},
             {x: 280, y: 200}
         ];
-        // Start with no movement
         this.direction = {x: 0, y: 0};
         this.size = 20;
         this.baseSpeed = 0.75;
@@ -48,13 +47,11 @@ class WordBox {
 
     draw(ctx) {
         if (!this.isCollected) {
-            ctx.fillStyle = '#D2B48C'; // Light brown color
+            ctx.fillStyle = '#D2B48C';
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = 'black';
-            // Reduced font size for smartphone
             ctx.font = '16px Arial';
             ctx.textAlign = 'center';
-            // Adjust vertical alignment for the font size
             ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 6);
         }
     }
@@ -87,58 +84,28 @@ class Game {
         this.words = this.sentences[this.currentSentenceIndex];
         this.gameOver = false;
         this.won = false;
-        // Flag to indicate if snake has begun moving
         this.gameActive = false;
         this.boxes = this.createRandomBoxes();
-        // Game started but not yet active (snake remains stationary)
-        this.gameStarted = false;  
+        this.gameStarted = false;
 
-        // Initialize touchButtons; these update on mobile.
-        this.touchButtons = {
-            up: { x: 0, y: 0, width: 40, height: 40 },
-            down: { x: 0, y: 0, width: 40, height: 40 },
-            left: { x: 0, y: 0, width: 40, height: 40 },
-            right: { x: 0, y: 0, width: 40, height: 40 }
-        };
-
-        this.setupTouchControls();
         this.setupControls();
         this.gameLoop();
-    }
-
-    // Detect mobile devices
-    isMobileDevice() {
-        return /Mobi|Android/i.test(navigator.userAgent);
     }
 
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        // Update touch buttons positions if on mobile; reserve bottom 150px for controls.
-        if (this.isMobileDevice()) {
-            this.touchButtons = {
-                up: { x: this.canvas.width / 2 - 30, y: this.canvas.height - 120, width: 60, height: 60 },
-                down: { x: this.canvas.width / 2 - 30, y: this.canvas.height - 60, width: 60, height: 60 },
-                left: { x: this.canvas.width / 2 - 90, y: this.canvas.height - 90, width: 60, height: 60 },
-                right: { x: this.canvas.width / 2 + 30, y: this.canvas.height - 90, width: 60, height: 60 }
-            };
-        }
     }
 
     createRandomBoxes() {
         const boxes = [];
         const shuffledWords = [...this.words].sort(() => Math.random() - 0.5);
         const tryX = () => 50 + Math.random() * (this.canvas.width - 180);
-        let minY = 50;
-        let maxY;
-        if (this.isMobileDevice()) {
-            // Reserve bottom 150 pixels for controls, plus box height
-            maxY = this.canvas.height - 150 - 40;
-        } else {
-            maxY = this.canvas.height - 40;
-        }
+        const minY = 50;
+        const maxY = this.canvas.height - 90;
         const tryY = () => minY + Math.random() * (maxY - minY);
         const tryPosition = () => ({ x: tryX(), y: tryY() });
+        
         const isTooClose = (pos, existingBoxes) => {
             const minDistance = 120;
             return existingBoxes.some(box => {
@@ -148,6 +115,7 @@ class Game {
                 return distance < minDistance;
             });
         };
+
         shuffledWords.forEach(word => {
             let position;
             let attempts = 0;
@@ -162,7 +130,6 @@ class Game {
 
     setupControls() {
         document.addEventListener('keydown', (e) => {
-            // If an arrow key is pressed, start the snake moving if not already active
             if (!this.gameActive && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
                 this.gameActive = true;
             }
@@ -212,52 +179,25 @@ class Game {
                 const rect = this.canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                // Adjust start button hit area based on device type.
+                
                 if (!this.gameStarted || this.gameOver) {
-                    if (this.isMobileDevice()) {
-                        const reservedArea = 150;
-                        const availableHeight = this.canvas.height - reservedArea;
-                        const buttonY = availableHeight / 2 + 20;
-                        if (y > buttonY - 20 && y < buttonY + 20 &&
-                            x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                            this.startGame();
-                        }
-                    } else {
-                        if (y > 180 && y < 220 &&
-                            x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                            this.startGame();
-                        }
+                    if (y > 180 && y < 220 &&
+                        x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
+                        this.startGame();
                     }
                 }
+                
                 if (this.won) {
-                    if (this.isMobileDevice()) {
-                        const reservedArea = 150;
-                        const availableHeight = this.canvas.height - reservedArea;
-                        const buttonY = availableHeight / 2 + 20;
-                        if (y > buttonY - 20 && y < buttonY + 20 &&
-                            x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                            if (this.currentSentenceIndex < this.sentences.length - 1) {
-                                this.currentSentenceIndex++;
-                                this.words = this.sentences[this.currentSentenceIndex];
-                                this.reset();
-                            } else {
-                                this.currentSentenceIndex = 0;
-                                this.words = this.sentences[this.currentSentenceIndex];
-                                this.reset();
-                            }
-                        }
-                    } else {
-                        if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
-                            x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                            if (this.currentSentenceIndex < this.sentences.length - 1) {
-                                this.currentSentenceIndex++;
-                                this.words = this.sentences[this.currentSentenceIndex];
-                                this.reset();
-                            } else {
-                                this.currentSentenceIndex = 0;
-                                this.words = this.sentences[this.currentSentenceIndex];
-                                this.reset();
-                            }
+                    if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
+                        x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
+                        if (this.currentSentenceIndex < this.sentences.length - 1) {
+                            this.currentSentenceIndex++;
+                            this.words = this.sentences[this.currentSentenceIndex];
+                            this.reset();
+                        } else {
+                            this.currentSentenceIndex = 0;
+                            this.words = this.sentences[this.currentSentenceIndex];
+                            this.reset();
                         }
                     }
                 }
@@ -266,121 +206,29 @@ class Game {
         }
     }
 
-    setupTouchControls() {
-        if (!this.isMobileDevice()) return;
-        this.canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const rect = this.canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-            // If game isn't active, any tap on a control will start movement.
-            if (!this.gameActive) {
-                this.gameActive = true;
-            }
-            if (!this.gameStarted || this.gameOver) {
-                const reservedArea = 150;
-                const availableHeight = this.canvas.height - reservedArea;
-                const buttonY = availableHeight / 2 + 20;
-                if (y > buttonY - 20 && y < buttonY + 20 &&
-                    x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                    this.startGame();
-                    return;
-                }
-            }
-            if (this.won) {
-                const reservedArea = 150;
-                const availableHeight = this.canvas.height - reservedArea;
-                const buttonY = availableHeight / 2 + 20;
-                if (y > buttonY - 20 && y < buttonY + 20 &&
-                    x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                    if (this.currentSentenceIndex < this.sentences.length - 1) {
-                        this.currentSentenceIndex++;
-                        this.words = this.sentences[this.currentSentenceIndex];
-                        this.reset();
-                    } else {
-                        this.currentSentenceIndex = 0;
-                        this.words = this.sentences[this.currentSentenceIndex];
-                        this.reset();
-                    }
-                    return;
-                }
-            }
-            if (this.gameStarted && !this.gameOver && !this.won) {
-                if (this.isPointInButton(x, y, this.touchButtons.up)) {
-                    this.snake.direction = { x: 0, y: -1 };
-                    this.snake.speed = this.snake.baseSpeed * 3;
-                }
-                if (this.isPointInButton(x, y, this.touchButtons.down)) {
-                    this.snake.direction = { x: 0, y: 1 };
-                    this.snake.speed = this.snake.baseSpeed * 3;
-                }
-                if (this.isPointInButton(x, y, this.touchButtons.left)) {
-                    this.snake.direction = { x: -1, y: 0 };
-                    this.snake.speed = this.snake.baseSpeed * 3;
-                }
-                if (this.isPointInButton(x, y, this.touchButtons.right)) {
-                    this.snake.direction = { x: 1, y: 0 };
-                    this.snake.speed = this.snake.baseSpeed * 3;
-                }
-            }
-        });
-        this.canvas.addEventListener('touchend', () => {
-            if (this.gameStarted && !this.gameOver && !this.won) {
-                this.snake.speed = this.snake.baseSpeed;
-            }
-        });
-    }
-
-    isPointInButton(x, y, button) {
-        return x >= button.x && x <= button.x + button.width &&
-               y >= button.y && y <= button.y + button.height;
-    }
-
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
         if (!this.gameStarted || this.gameOver) {
             this.ctx.fillStyle = 'black';
-            // Reduced starting message font size for smartphones
             this.ctx.font = 'bold 20px Arial';
             this.ctx.textAlign = 'center';
-            let messageY = 100;
-            let buttonY = 200;
-            // On mobile, ensure text is above the bottom control panel (reserved 150px)
-            if (this.isMobileDevice()) {
-                const reservedArea = 150;
-                const availableHeight = this.canvas.height - reservedArea;
-                messageY = availableHeight / 2 - 20;
-                buttonY = availableHeight / 2 + 20;
-            }
-            this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, messageY);
-            this.drawButton("Let's go!", this.canvas.width / 2, buttonY, 120, 40, 'blue');
+            this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, 100);
+            this.drawButton("Let's go!", this.canvas.width / 2, 200, 120, 40, 'blue');
         } else {
             this.boxes.forEach(box => box.draw(this.ctx));
             this.snake.draw(this.ctx);
         }
+        
         if (this.won) {
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = 'green';
-            // Reduced win message font size
             this.ctx.font = '28px Arial';
             this.ctx.textAlign = 'center';
-            let messageY = this.canvas.height / 2;
-            let buttonY = this.canvas.height / 2 + 60;
-            // On mobile, draw win message above the reserved control panel
-            if (this.isMobileDevice()) {
-                const reservedArea = 150;
-                const availableHeight = this.canvas.height - reservedArea;
-                messageY = availableHeight / 2 - 20;
-                buttonY = availableHeight / 2 + 20;
-            }
-            this.ctx.fillText('You Won!', this.canvas.width / 2, messageY);
+            this.ctx.fillText('You Won!', this.canvas.width / 2, this.canvas.height / 2);
             const buttonText = this.currentSentenceIndex < this.sentences.length - 1 ? 'Next?' : 'Play Again';
-            this.drawButton(buttonText, this.canvas.width / 2, buttonY, 120, 40, 'blue');
-        }
-        if (this.gameStarted && !this.gameOver && !this.won && this.isMobileDevice()) {
-            this.drawTouchControls();
+            this.drawButton(buttonText, this.canvas.width / 2, this.canvas.height / 2 + 60, 120, 40, 'blue');
         }
     }
 
@@ -388,52 +236,13 @@ class Game {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(x - width / 2, y - height / 2, width, height);
         this.ctx.fillStyle = 'white';
-        // Reduced button font size
         this.ctx.font = '16px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.fillText(text, x, y + 6);
     }
 
-    drawTouchControls() {
-        this.ctx.fillStyle = 'rgba(0, 0, 255, 0.3)';
-        // Draw large control buttons at the bottom of the screen
-        // Up arrow
-        let btn = this.touchButtons.up;
-        this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.25, btn.y + btn.height * 0.65);
-        this.ctx.lineTo(btn.x + btn.width * 0.75, btn.y + btn.height * 0.65);
-        this.ctx.lineTo(btn.x + btn.width / 2, btn.y + btn.height * 0.35);
-        this.ctx.closePath();
-        this.ctx.fill();
-        // Down arrow
-        btn = this.touchButtons.down;
-        this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.25, btn.y + btn.height * 0.35);
-        this.ctx.lineTo(btn.x + btn.width * 0.75, btn.y + btn.height * 0.35);
-        this.ctx.lineTo(btn.x + btn.width / 2, btn.y + btn.height * 0.65);
-        this.ctx.closePath();
-        this.ctx.fill();
-        // Left arrow
-        btn = this.touchButtons.left;
-        this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.65, btn.y + btn.height * 0.25);
-        this.ctx.lineTo(btn.x + btn.width * 0.65, btn.y + btn.height * 0.75);
-        this.ctx.lineTo(btn.x + btn.width * 0.35, btn.y + btn.height / 2);
-        this.ctx.closePath();
-        this.ctx.fill();
-        // Right arrow
-        btn = this.touchButtons.right;
-        this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.35, btn.y + btn.height * 0.25);
-        this.ctx.lineTo(btn.x + btn.width * 0.35, btn.y + btn.height * 0.75);
-        this.ctx.lineTo(btn.x + btn.width * 0.65, btn.y + btn.height / 2);
-        this.ctx.closePath();
-        this.ctx.fill();
-    }
-
     startGame() {
         this.gameStarted = true;
-        // Keep snake stationary until a control is tapped.
         this.gameActive = false;
         this.gameOver = false;
         this.currentWordIndex = 0;
@@ -455,6 +264,7 @@ class Game {
 
     checkCollisions() {
         if (!this.gameStarted) return;
+        
         this.boxes.forEach(box => {
             if (box.checkCollision(this.snake)) {
                 if (box.word === this.words[this.currentWordIndex]) {
@@ -474,6 +284,7 @@ class Game {
                 }
             }
         });
+
         const head = this.snake.segments[0];
         if (head.x < 0 || head.x > this.canvas.width - this.snake.size ||
             head.y < 0 || head.y > this.canvas.height - this.snake.size) {
@@ -493,4 +304,4 @@ class Game {
 }
 
 // Start the game
-new Game();
+new Game(); 
