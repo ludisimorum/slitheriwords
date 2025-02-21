@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Word Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+    </style>
+    <script>
+        // Detect if user is on mobile
+        function isMobileDevice() {
+            return /Mobi|Android|iPhone/i.test(navigator.userAgent);
+        }
+        
+        // Redirect to appropriate version
+        window.onload = function() {
+            try {
+                if (isMobileDevice()) {
+                    window.location.href = './mobile/mobile.html';
+                } else {
+                    window.location.href = './pc/pc.html';
+                }
+            } catch (error) {
+                console.error('Redirect failed:', error);
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Manual redirect functions
+        function goToPC() {
+            window.location.href = './pc/pc.html';
+        }
+
+        function goToMobile() {
+            window.location.href = './mobile/mobile.html';
+        }
+    </script>
+</head>
+<body>
+    <h1>Snake Word Game</h1>
+    <p>Redirecting to appropriate version...</p>
+    
+    <div id="error" style="display: none;">
+        <p>If you're not automatically redirected, please choose your version:</p>
+        <div class="buttons">
+            <button onclick="goToPC()">PC Version</button>
+            <button onclick="goToMobile()">Mobile Version</button>
+        </div>
+    </div>
+</body>
+</html> 
