@@ -5,7 +5,7 @@ class Snake {
             {x: 280, y: 200}
         ];
         this.direction = {x: 0, y: 0};
-        this.size = 20;
+        this.size = 30; // Larger size for mobile
         this.baseSpeed = 0.75;
         this.speed = this.baseSpeed;
         this.isSmiling = false;
@@ -28,7 +28,7 @@ class Snake {
         const head = this.segments[0];
         if (this.isSmiling) {
             ctx.beginPath();
-            ctx.arc(head.x + this.size / 2, head.y + this.size / 2, 8, 0, Math.PI, false);
+            ctx.arc(head.x + this.size / 2, head.y + this.size / 2, 12, 0, Math.PI, false);
             ctx.strokeStyle = 'black';
             ctx.stroke();
         }
@@ -40,8 +40,8 @@ class WordBox {
         this.word = word;
         this.x = x;
         this.y = y;
-        this.width = 80;
-        this.height = 40;
+        this.width = 100; // Larger for mobile
+        this.height = 50; // Larger for mobile
         this.isCollected = false;
     }
 
@@ -50,9 +50,9 @@ class WordBox {
             ctx.fillStyle = '#D2B48C';
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = 'black';
-            ctx.font = '16px Arial';
+            ctx.font = '20px Arial'; // Larger font for mobile
             ctx.textAlign = 'center';
-            ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 6);
+            ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 8);
         }
     }
 
@@ -85,29 +85,46 @@ class Game {
         this.gameOver = false;
         this.won = false;
         this.gameActive = false;
-        this.boxes = this.createRandomBoxes();
         this.gameStarted = false;
 
-        this.setupControls();
+        // Initialize touch buttons with larger sizes
+        this.touchButtons = {
+            up: { x: 0, y: 0, width: 80, height: 80 },
+            down: { x: 0, y: 0, width: 80, height: 80 },
+            left: { x: 0, y: 0, width: 80, height: 80 },
+            right: { x: 0, y: 0, width: 80, height: 80 }
+        };
+
+        this.boxes = this.createRandomBoxes();
+        this.setupTouchControls();
         this.gameLoop();
     }
 
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        
+        // Update touch buttons positions
+        const bottomPadding = 150;
+        this.touchButtons = {
+            up: { x: this.canvas.width / 2 - 40, y: this.canvas.height - bottomPadding + 10, width: 80, height: 80 },
+            down: { x: this.canvas.width / 2 - 40, y: this.canvas.height - 90, width: 80, height: 80 },
+            left: { x: this.canvas.width / 2 - 130, y: this.canvas.height - bottomPadding + 60, width: 80, height: 80 },
+            right: { x: this.canvas.width / 2 + 50, y: this.canvas.height - bottomPadding + 60, width: 80, height: 80 }
+        };
     }
 
     createRandomBoxes() {
         const boxes = [];
         const shuffledWords = [...this.words].sort(() => Math.random() - 0.5);
-        const tryX = () => 50 + Math.random() * (this.canvas.width - 180);
+        const tryX = () => 50 + Math.random() * (this.canvas.width - 200);
         const minY = 50;
-        const maxY = this.canvas.height - 90;
+        const maxY = this.canvas.height - 250; // Account for touch controls
         const tryY = () => minY + Math.random() * (maxY - minY);
         const tryPosition = () => ({ x: tryX(), y: tryY() });
         
         const isTooClose = (pos, existingBoxes) => {
-            const minDistance = 120;
+            const minDistance = 140;
             return existingBoxes.some(box => {
                 const distance = Math.sqrt(
                     Math.pow(pos.x - box.x, 2) + Math.pow(pos.y - box.y, 2)
@@ -128,82 +145,57 @@ class Game {
         return boxes;
     }
 
-    setupControls() {
-        document.addEventListener('keydown', (e) => {
-            if (!this.gameActive && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+    setupTouchControls() {
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = this.canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            if (!this.gameActive) {
                 this.gameActive = true;
             }
-            switch (e.key) {
-                case 'ArrowUp':
+
+            if (!this.gameStarted || this.gameOver) {
+                const buttonY = this.canvas.height / 2;
+                if (y > buttonY - 30 && y < buttonY + 30 &&
+                    x > this.canvas.width / 2 - 70 && x < this.canvas.width / 2 + 70) {
+                    this.startGame();
+                    return;
+                }
+            }
+
+            if (this.gameStarted && !this.gameOver && !this.won) {
+                if (this.isPointInButton(x, y, this.touchButtons.up)) {
                     this.snake.direction = { x: 0, y: -1 };
                     this.snake.speed = this.snake.baseSpeed * 3;
-                    break;
-                case 'ArrowDown':
+                }
+                if (this.isPointInButton(x, y, this.touchButtons.down)) {
                     this.snake.direction = { x: 0, y: 1 };
                     this.snake.speed = this.snake.baseSpeed * 3;
-                    break;
-                case 'ArrowLeft':
+                }
+                if (this.isPointInButton(x, y, this.touchButtons.left)) {
                     this.snake.direction = { x: -1, y: 0 };
                     this.snake.speed = this.snake.baseSpeed * 3;
-                    break;
-                case 'ArrowRight':
+                }
+                if (this.isPointInButton(x, y, this.touchButtons.right)) {
                     this.snake.direction = { x: 1, y: 0 };
                     this.snake.speed = this.snake.baseSpeed * 3;
-                    break;
-                case 'Enter':
-                    if (!this.gameStarted || this.gameOver) {
-                        this.startGame();
-                    } else if (this.won) {
-                        if (this.currentSentenceIndex < this.sentences.length - 1) {
-                            this.currentSentenceIndex++;
-                            this.words = this.sentences[this.currentSentenceIndex];
-                            this.reset();
-                        } else {
-                            this.currentSentenceIndex = 0;
-                            this.words = this.sentences[this.currentSentenceIndex];
-                            this.reset();
-                        }
-                    }
-                    break;
+                }
             }
         });
 
-        document.addEventListener('keyup', (e) => {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        this.canvas.addEventListener('touchend', () => {
+            if (this.gameStarted && !this.gameOver && !this.won) {
                 this.snake.speed = this.snake.baseSpeed;
             }
         });
+    }
 
-        if (!this.hasClickListener) {
-            this.canvas.addEventListener('click', (e) => {
-                const rect = this.canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                if (!this.gameStarted || this.gameOver) {
-                    if (y > 180 && y < 220 &&
-                        x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                        this.startGame();
-                    }
-                }
-                
-                if (this.won) {
-                    if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
-                        x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
-                        if (this.currentSentenceIndex < this.sentences.length - 1) {
-                            this.currentSentenceIndex++;
-                            this.words = this.sentences[this.currentSentenceIndex];
-                            this.reset();
-                        } else {
-                            this.currentSentenceIndex = 0;
-                            this.words = this.sentences[this.currentSentenceIndex];
-                            this.reset();
-                        }
-                    }
-                }
-            });
-            this.hasClickListener = true;
-        }
+    isPointInButton(x, y, button) {
+        return x >= button.x && x <= button.x + button.width &&
+               y >= button.y && y <= button.y + button.height;
     }
 
     draw() {
@@ -211,10 +203,10 @@ class Game {
         
         if (!this.gameStarted || this.gameOver) {
             this.ctx.fillStyle = 'black';
-            this.ctx.font = 'bold 20px Arial';
+            this.ctx.font = 'bold 24px Arial';
             this.ctx.textAlign = 'center';
-            this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, 100);
-            this.drawButton("Let's go!", this.canvas.width / 2, 200, 120, 40, 'blue');
+            this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, this.canvas.height / 3);
+            this.drawButton("Let's go!", this.canvas.width / 2, this.canvas.height / 2, 140, 60, 'blue');
         } else {
             this.boxes.forEach(box => box.draw(this.ctx));
             this.snake.draw(this.ctx);
@@ -224,11 +216,15 @@ class Game {
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = 'green';
-            this.ctx.font = '28px Arial';
+            this.ctx.font = '32px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText('You Won!', this.canvas.width / 2, this.canvas.height / 2);
             const buttonText = this.currentSentenceIndex < this.sentences.length - 1 ? 'Next?' : 'Play Again';
-            this.drawButton(buttonText, this.canvas.width / 2, this.canvas.height / 2 + 60, 120, 40, 'blue');
+            this.drawButton(buttonText, this.canvas.width / 2, this.canvas.height / 2 + 60, 140, 60, 'blue');
+        }
+
+        if (this.gameStarted && !this.gameOver && !this.won) {
+            this.drawTouchControls();
         }
     }
 
@@ -236,9 +232,59 @@ class Game {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(x - width / 2, y - height / 2, width, height);
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '16px Arial';
+        this.ctx.font = '24px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(text, x, y + 6);
+        this.ctx.fillText(text, x, y + 8);
+    }
+
+    drawTouchControls() {
+        this.ctx.fillStyle = 'rgba(0, 0, 255, 0.3)';
+        
+        // Draw arrows
+        Object.values(this.touchButtons).forEach(btn => {
+            this.ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
+        });
+
+        // Draw arrow symbols
+        this.ctx.fillStyle = 'white';
+        this.ctx.strokeStyle = 'white';
+        this.ctx.lineWidth = 3;
+
+        // Up arrow
+        let btn = this.touchButtons.up;
+        this.ctx.beginPath();
+        this.ctx.moveTo(btn.x + btn.width * 0.5, btn.y + btn.height * 0.2);
+        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.8);
+        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.8);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Down arrow
+        btn = this.touchButtons.down;
+        this.ctx.beginPath();
+        this.ctx.moveTo(btn.x + btn.width * 0.5, btn.y + btn.height * 0.8);
+        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.2);
+        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.2);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Left arrow
+        btn = this.touchButtons.left;
+        this.ctx.beginPath();
+        this.ctx.moveTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.5);
+        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.2);
+        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.8);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Right arrow
+        btn = this.touchButtons.right;
+        this.ctx.beginPath();
+        this.ctx.moveTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.5);
+        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.2);
+        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.8);
+        this.ctx.closePath();
+        this.ctx.fill();
     }
 
     startGame() {
