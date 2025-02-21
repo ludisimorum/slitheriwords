@@ -111,13 +111,13 @@ class Game {
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        // Update touch buttons positions if on mobile
+        // Update touch buttons positions if on mobile (moved up by 10 pixels)
         if (this.isMobileDevice()) {
             this.touchButtons = {
-                up: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 100, width: 40, height: 40 },
-                down: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 40, width: 40, height: 40 },
-                left: { x: this.canvas.width / 2 - 80, y: this.canvas.height - 70, width: 40, height: 40 },
-                right: { x: this.canvas.width / 2 + 40, y: this.canvas.height - 70, width: 40, height: 40 }
+                up: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 110, width: 40, height: 40 },
+                down: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 50, width: 40, height: 40 },
+                left: { x: this.canvas.width / 2 - 80, y: this.canvas.height - 80, width: 40, height: 40 },
+                right: { x: this.canvas.width / 2 + 40, y: this.canvas.height - 80, width: 40, height: 40 }
             };
         }
     }
