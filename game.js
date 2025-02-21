@@ -91,10 +91,10 @@ class Game {
         this.gameStarted = false;  // New flag to track if game has started
         
         this.touchButtons = {
-            up: { x: 300, y: 320, width: 40, height: 40 },
-            down: { x: 300, y: 380, width: 40, height: 40 },
-            left: { x: 250, y: 350, width: 40, height: 40 },
-            right: { x: 350, y: 350, width: 40, height: 40 }
+            up: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 100, width: 40, height: 40 },
+            down: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 40, width: 40, height: 40 },
+            left: { x: this.canvas.width / 2 - 80, y: this.canvas.height - 70, width: 40, height: 40 },
+            right: { x: this.canvas.width / 2 + 40, y: this.canvas.height - 70, width: 40, height: 40 }
         };
         this.setupTouchControls();
         this.setupControls();
@@ -310,8 +310,8 @@ class Game {
             this.drawButton(buttonText, this.canvas.width / 2, this.canvas.height / 2 + 60, 120, 40, 'blue');
         }
 
-        // Draw touch controls if game is active
-        if (this.gameStarted && !this.gameOver && !this.won) {
+        // Draw touch controls if game is active and on a touch device
+        if (this.gameStarted && !this.gameOver && !this.won && 'ontouchstart' in window) {
             this.drawTouchControls();
         }
     }
