@@ -88,29 +88,45 @@ class Game {
         this.gameOver = false;
         this.won = false;
         this.boxes = this.createRandomBoxes();
-        this.gameStarted = false;  // New flag to track if game has started
-        
+        this.gameStarted = false;  // Flag to track if game has started
+
+        // Initialize touchButtons with default values; they will be updated in resizeCanvas if on mobile.
         this.touchButtons = {
-            up: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 100, width: 40, height: 40 },
-            down: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 40, width: 40, height: 40 },
-            left: { x: this.canvas.width / 2 - 80, y: this.canvas.height - 70, width: 40, height: 40 },
-            right: { x: this.canvas.width / 2 + 40, y: this.canvas.height - 70, width: 40, height: 40 }
+            up: { x: 0, y: 0, width: 40, height: 40 },
+            down: { x: 0, y: 0, width: 40, height: 40 },
+            left: { x: 0, y: 0, width: 40, height: 40 },
+            right: { x: 0, y: 0, width: 40, height: 40 }
         };
+
         this.setupTouchControls();
         this.setupControls();
         this.gameLoop();
     }
 
+    // Helper function to detect mobile devices
+    isMobileDevice() {
+        return /Mobi|Android/i.test(navigator.userAgent);
+    }
+
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        // Update touch buttons positions if on mobile
+        if (this.isMobileDevice()) {
+            this.touchButtons = {
+                up: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 100, width: 40, height: 40 },
+                down: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 40, width: 40, height: 40 },
+                left: { x: this.canvas.width / 2 - 80, y: this.canvas.height - 70, width: 40, height: 40 },
+                right: { x: this.canvas.width / 2 + 40, y: this.canvas.height - 70, width: 40, height: 40 }
+            };
+        }
     }
 
     createRandomBoxes() {
         const boxes = [];
         const shuffledWords = [...this.words].sort(() => Math.random() - 0.5);
         const minDistance = 120; // Minimum distance between boxes
-        
+
         const tryPosition = () => {
             return {
                 x: 50 + Math.random() * (this.canvas.width - 180),
@@ -220,6 +236,9 @@ class Game {
     }
 
     setupTouchControls() {
+        // Only attach touch controls if on a mobile device
+        if (!this.isMobileDevice()) return;
+        
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling when touching the canvas
             const rect = this.canvas.getBoundingClientRect();
@@ -310,8 +329,8 @@ class Game {
             this.drawButton(buttonText, this.canvas.width / 2, this.canvas.height / 2 + 60, 120, 40, 'blue');
         }
 
-        // Draw touch controls if game is active and on a touch device
-        if (this.gameStarted && !this.gameOver && !this.won && 'ontouchstart' in window) {
+        // Draw touch controls only on mobile devices
+        if (this.gameStarted && !this.gameOver && !this.won && this.isMobileDevice()) {
             this.drawTouchControls();
         }
     }
@@ -325,7 +344,7 @@ class Game {
     }
 
     drawTouchControls() {
-        // Draw direction buttons
+        // Draw direction buttons at the bottom of the screen
         this.ctx.fillStyle = 'rgba(0, 0, 255, 0.3)';
         
         // Up arrow
