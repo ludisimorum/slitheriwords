@@ -4,8 +4,7 @@ class Snake {
             {x: 300, y: 200},
             {x: 280, y: 200}
         ];
-        // Start with no movement
-        this.direction = {x: 0, y: 0};
+        this.direction = {x: 1, y: 0};
         this.size = 20;
         this.baseSpeed = 0.75;
         this.speed = this.baseSpeed;
@@ -22,10 +21,13 @@ class Snake {
     }
 
     draw(ctx) {
+        // Draw body
         ctx.fillStyle = 'green';
         this.segments.forEach(segment => {
             ctx.fillRect(segment.x, segment.y, this.size, this.size);
         });
+
+        // Draw face
         const head = this.segments[0];
         if (this.isSmiling) {
             ctx.beginPath();
@@ -51,9 +53,10 @@ class WordBox {
             ctx.fillStyle = '#D2B48C'; // Light brown color
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = 'black';
-            ctx.font = '40px Arial'; // doubled font size
+            // Font doubled from 20px to 40px
+            ctx.font = '40px Arial';
             ctx.textAlign = 'center';
-            // Adjust vertical alignment for larger font
+            // Adjust vertical alignment for the larger font
             ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 14);
         }
     }
@@ -86,18 +89,15 @@ class Game {
         this.words = this.sentences[this.currentSentenceIndex];
         this.gameOver = false;
         this.won = false;
-        // Flag to indicate if snake has begun moving
-        this.gameActive = false;
         this.boxes = this.createRandomBoxes();
-        // Game started but not yet active (snake remains stationary)
-        this.gameStarted = false;  
+        this.gameStarted = false;  // Flag to track if game has started
 
-        // Initialize touchButtons with default values; these will update on mobile.
+        // Initialize touchButtons with default values; they will be updated in resizeCanvas if on mobile.
         this.touchButtons = {
-            up: { x: 0, y: 0, width: 40, height: 40 },
-            down: { x: 0, y: 0, width: 40, height: 40 },
-            left: { x: 0, y: 0, width: 40, height: 40 },
-            right: { x: 0, y: 0, width: 40, height: 40 }
+            up: { x: 0, y: 0, width: 60, height: 60 },
+            down: { x: 0, y: 0, width: 60, height: 60 },
+            left: { x: 0, y: 0, width: 60, height: 60 },
+            right: { x: 0, y: 0, width: 60, height: 60 }
         };
 
         this.setupTouchControls();
@@ -105,7 +105,7 @@ class Game {
         this.gameLoop();
     }
 
-    // Detect mobile devices
+    // Helper function to detect mobile devices
     isMobileDevice() {
         return /Mobi|Android/i.test(navigator.userAgent);
     }
@@ -113,40 +113,55 @@ class Game {
     resizeCanvas() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        // Update touch buttons positions if on mobile
+        // Update touch buttons positions if on mobile.
         if (this.isMobileDevice()) {
+            // Using the same center positions as before but adjusting for the larger 60x60 size.
             this.touchButtons = {
-                up: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 100, width: 40, height: 40 },
-                down: { x: this.canvas.width / 2 - 20, y: this.canvas.height - 40, width: 40, height: 40 },
-                left: { x: this.canvas.width / 2 - 80, y: this.canvas.height - 70, width: 40, height: 40 },
-                right: { x: this.canvas.width / 2 + 40, y: this.canvas.height - 70, width: 40, height: 40 }
+                // Up arrow: centered at (canvas.width/2, canvas.height - 90)
+                up: { x: this.canvas.width / 2 - 30, y: this.canvas.height - 90 - 30, width: 60, height: 60 },
+                // Down arrow: centered at (canvas.width/2, canvas.height - 30)
+                down: { x: this.canvas.width / 2 - 30, y: this.canvas.height - 30 - 30, width: 60, height: 60 },
+                // Left arrow: centered at (canvas.width/2 - 60, canvas.height - 60)
+                left: { x: this.canvas.width / 2 - 60 - 30, y: this.canvas.height - 60 - 30, width: 60, height: 60 },
+                // Right arrow: centered at (canvas.width/2 + 60, canvas.height - 60)
+                right: { x: this.canvas.width / 2 + 60 - 30, y: this.canvas.height - 60 - 30, width: 60, height: 60 }
             };
         }
     }
 
     createRandomBoxes() {
         const boxes = [];
+        // Shuffle words
         const shuffledWords = [...this.words].sort(() => Math.random() - 0.5);
+        
+        // Define horizontal positioning similar to before
         const tryX = () => 50 + Math.random() * (this.canvas.width - 180);
         let minY = 50;
         let maxY;
+        // If on mobile, restrict the vertical range so boxes are above the control panel.
         if (this.isMobileDevice()) {
-            // Reserve bottom 150 pixels for controls, plus box height
+            // Reserve roughly the bottom 150 pixels for controls (plus the box height of 40)
             maxY = this.canvas.height - 150 - 40;
         } else {
             maxY = this.canvas.height - 40;
         }
         const tryY = () => minY + Math.random() * (maxY - minY);
-        const tryPosition = () => ({ x: tryX(), y: tryY() });
+
+        const tryPosition = () => {
+            return { x: tryX(), y: tryY() };
+        };
+
         const isTooClose = (pos, existingBoxes) => {
-            const minDistance = 120;
+            const minDistance = 120; // Minimum distance between boxes
             return existingBoxes.some(box => {
                 const distance = Math.sqrt(
-                    Math.pow(pos.x - box.x, 2) + Math.pow(pos.y - box.y, 2)
+                    Math.pow(pos.x - box.x, 2) + 
+                    Math.pow(pos.y - box.y, 2)
                 );
                 return distance < minDistance;
             });
         };
+
         shuffledWords.forEach(word => {
             let position;
             let attempts = 0;
@@ -154,17 +169,15 @@ class Game {
                 position = tryPosition();
                 attempts++;
             } while (isTooClose(position, boxes) && attempts < 100);
+
             boxes.push(new WordBox(word, position.x, position.y));
         });
+        
         return boxes;
     }
 
     setupControls() {
         document.addEventListener('keydown', (e) => {
-            // If an arrow key is pressed, start the snake moving if not already active
-            if (!this.gameActive && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                this.gameActive = true;
-            }
             switch (e.key) {
                 case 'ArrowUp':
                     this.snake.direction = { x: 0, y: -1 };
@@ -183,9 +196,12 @@ class Game {
                     this.snake.speed = this.snake.baseSpeed * 3;
                     break;
                 case 'Enter':
+                    // Handle Let's go! button
                     if (!this.gameStarted || this.gameOver) {
                         this.startGame();
-                    } else if (this.won) {
+                    }
+                    // Handle Next/Play Again button
+                    else if (this.won) {
                         if (this.currentSentenceIndex < this.sentences.length - 1) {
                             this.currentSentenceIndex++;
                             this.words = this.sentences[this.currentSentenceIndex];
@@ -211,11 +227,13 @@ class Game {
                 const rect = this.canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                if ((!this.gameStarted || this.gameOver) &&
-                    y > 180 && y < 220 &&
+                
+                if ((!this.gameStarted || this.gameOver) && 
+                    y > 180 && y < 220 && 
                     x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
                     this.startGame();
                 }
+                
                 if (this.won) {
                     if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
                         x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
@@ -236,23 +254,23 @@ class Game {
     }
 
     setupTouchControls() {
+        // Only attach touch controls if on a mobile device
         if (!this.isMobileDevice()) return;
+        
         this.canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Prevent scrolling when touching the canvas
             const rect = this.canvas.getBoundingClientRect();
             const touch = e.touches[0];
             const x = touch.clientX - rect.left;
             const y = touch.clientY - rect.top;
-            // If game isn't active yet, any tap on a control will start movement.
-            if (!this.gameActive) {
-                this.gameActive = true;
-            }
+
+            // Check Let's go! and Next buttons
             if (!this.gameStarted || this.gameOver) {
-                if (y > 180 && y < 220 &&
-                    x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
+                if (y > 180 && y < 220 && x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
                     this.startGame();
                 }
             }
+            
             if (this.won) {
                 if (y > this.canvas.height / 2 + 40 && y < this.canvas.height / 2 + 80 &&
                     x > this.canvas.width / 2 - 60 && x < this.canvas.width / 2 + 60) {
@@ -267,6 +285,8 @@ class Game {
                     }
                 }
             }
+
+            // Check direction buttons
             if (this.gameStarted && !this.gameOver && !this.won) {
                 if (this.isPointInButton(x, y, this.touchButtons.up)) {
                     this.snake.direction = { x: 0, y: -1 };
@@ -286,6 +306,7 @@ class Game {
                 }
             }
         });
+
         this.canvas.addEventListener('touchend', () => {
             if (this.gameStarted && !this.gameOver && !this.won) {
                 this.snake.speed = this.snake.baseSpeed;
@@ -300,26 +321,35 @@ class Game {
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
         if (!this.gameStarted || this.gameOver) {
             this.ctx.fillStyle = 'black';
+            // Sentence font doubled from bold 28px to bold 56px
             this.ctx.font = 'bold 56px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, 100);
+            
             this.drawButton("Let's go!", this.canvas.width / 2, 200, 120, 40, 'blue');
         } else {
             this.boxes.forEach(box => box.draw(this.ctx));
             this.snake.draw(this.ctx);
         }
+
         if (this.won) {
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
             this.ctx.fillStyle = 'green';
+            // "You Won!" font doubled from 48px to 96px
             this.ctx.font = '96px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText('You Won!', this.canvas.width / 2, this.canvas.height / 2);
+            
             const buttonText = this.currentSentenceIndex < this.sentences.length - 1 ? 'Next?' : 'Play Again';
             this.drawButton(buttonText, this.canvas.width / 2, this.canvas.height / 2 + 60, 120, 40, 'blue');
         }
+
+        // Draw touch controls only on mobile devices
         if (this.gameStarted && !this.gameOver && !this.won && this.isMobileDevice()) {
             this.drawTouchControls();
         }
@@ -329,12 +359,16 @@ class Game {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(x - width / 2, y - height / 2, width, height);
         this.ctx.fillStyle = 'white';
+        // Button font doubled from 20px to 40px
         this.ctx.font = '40px Arial';
         this.ctx.fillText(text, x, y + 14);
     }
 
     drawTouchControls() {
+        // Draw direction buttons at the bottom of the screen.
+        // We'll use proportional coordinates to draw nice, scaled arrow triangles.
         this.ctx.fillStyle = 'rgba(0, 0, 255, 0.3)';
+
         // Up arrow
         let btn = this.touchButtons.up;
         this.ctx.beginPath();
@@ -343,6 +377,7 @@ class Game {
         this.ctx.lineTo(btn.x + btn.width / 2, btn.y + btn.height * 0.35);
         this.ctx.closePath();
         this.ctx.fill();
+
         // Down arrow
         btn = this.touchButtons.down;
         this.ctx.beginPath();
@@ -351,6 +386,7 @@ class Game {
         this.ctx.lineTo(btn.x + btn.width / 2, btn.y + btn.height * 0.65);
         this.ctx.closePath();
         this.ctx.fill();
+
         // Left arrow
         btn = this.touchButtons.left;
         this.ctx.beginPath();
@@ -359,6 +395,7 @@ class Game {
         this.ctx.lineTo(btn.x + btn.width * 0.35, btn.y + btn.height / 2);
         this.ctx.closePath();
         this.ctx.fill();
+
         // Right arrow
         btn = this.touchButtons.right;
         this.ctx.beginPath();
@@ -371,37 +408,35 @@ class Game {
 
     startGame() {
         this.gameStarted = true;
-        // When a game starts, keep snake stationary until a control is tapped.
-        this.gameActive = false;
         this.gameOver = false;
         this.currentWordIndex = 0;
         this.snake = new Snake();
-        this.snake.direction = { x: 0, y: 0 };
         this.boxes = this.createRandomBoxes();
     }
 
     reset() {
         this.gameStarted = false;
-        this.gameActive = false;
         this.currentWordIndex = 0;
         this.gameOver = false;
         this.won = false;
         this.snake = new Snake();
-        this.snake.direction = { x: 0, y: 0 };
         this.boxes = this.createRandomBoxes();
     }
 
     checkCollisions() {
         if (!this.gameStarted) return;
+        
         this.boxes.forEach(box => {
             if (box.checkCollision(this.snake)) {
                 if (box.word === this.words[this.currentWordIndex]) {
                     box.isCollected = true;
                     this.currentWordIndex++;
+                    
                     const currentSegments = [...this.snake.segments];
                     currentSegments.forEach(segment => {
                         this.snake.segments.push({ ...segment });
                     });
+                    
                     if (this.currentWordIndex >= this.words.length) {
                         this.won = true;
                         this.snake.isSmiling = true;
@@ -412,6 +447,7 @@ class Game {
                 }
             }
         });
+
         const head = this.snake.segments[0];
         if (head.x < 0 || head.x > this.canvas.width - this.snake.size ||
             head.y < 0 || head.y > this.canvas.height - this.snake.size) {
@@ -421,8 +457,7 @@ class Game {
     }
 
     gameLoop() {
-        // Only move the snake if game is active (after a control is tapped)
-        if (this.gameStarted && this.gameActive && !this.gameOver && !this.won) {
+        if (this.gameStarted && !this.gameOver && !this.won) {
             this.snake.move();
             this.checkCollisions();
         }
