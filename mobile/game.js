@@ -168,14 +168,19 @@ class Game {
     }
 
     setupTouchControls() {
+        console.log("Setting up touch controls");
+        
         this.canvas.addEventListener('touchstart', (e) => {
+            console.log("Touch detected");
             e.preventDefault();
             const rect = this.canvas.getBoundingClientRect();
             const touch = e.touches[0];
             const x = touch.clientX - rect.left;
             const y = touch.clientY - rect.top;
+            console.log("Touch coordinates:", x, y);
 
             if (!this.gameActive) {
+                console.log("Activating game");
                 this.gameActive = true;
             }
 
@@ -190,6 +195,7 @@ class Game {
 
             if (this.gameStarted && !this.gameOver && !this.won) {
                 if (this.isPointInButton(x, y, this.touchButtons.up)) {
+                    console.log("Up button pressed");
                     this.snake.direction = { x: 0, y: -1 };
                     this.snake.speed = this.snake.baseSpeed * 3;
                 }

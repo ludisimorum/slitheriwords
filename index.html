@@ -28,9 +28,15 @@
         // Redirect to appropriate version
         window.onload = function() {
             try {
-                if (isMobileDevice()) {
+                console.log("Device check running");
+                const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+                console.log("Is mobile device:", isMobile);
+                
+                if (isMobile) {
+                    console.log("Redirecting to mobile version");
                     window.location.href = './mobile/mobile.html';
                 } else {
+                    console.log("Redirecting to PC version");
                     window.location.href = './pc/pc.html';
                 }
             } catch (error) {
