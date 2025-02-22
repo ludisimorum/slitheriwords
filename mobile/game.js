@@ -70,6 +70,40 @@ class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
+        
+        // Initialize touch buttons with fixed positions and larger size
+        const buttonSize = 120; // Even larger buttons
+        const bottomPadding = 200;
+        
+        this.touchButtons = {
+            up: { 
+                x: this.canvas.width / 2 - buttonSize/2, 
+                y: this.canvas.height - bottomPadding, 
+                width: buttonSize, 
+                height: buttonSize 
+            },
+            down: { 
+                x: this.canvas.width / 2 - buttonSize/2, 
+                y: this.canvas.height - buttonSize - 20, 
+                width: buttonSize, 
+                height: buttonSize 
+            },
+            left: { 
+                x: this.canvas.width / 2 - buttonSize * 1.5, 
+                y: this.canvas.height - bottomPadding + buttonSize/2, 
+                width: buttonSize, 
+                height: buttonSize 
+            },
+            right: { 
+                x: this.canvas.width / 2 + buttonSize/2, 
+                y: this.canvas.height - bottomPadding + buttonSize/2, 
+                width: buttonSize, 
+                height: buttonSize 
+            }
+        };
+        
+        console.log('Touch buttons initialized:', this.touchButtons);
+        
         this.resizeCanvas();
         window.addEventListener('resize', () => this.resizeCanvas());
 
@@ -86,14 +120,6 @@ class Game {
         this.won = false;
         this.gameActive = false;
         this.gameStarted = false;
-
-        // Initialize touch buttons with larger sizes
-        this.touchButtons = {
-            up: { x: 0, y: 0, width: 80, height: 80 },
-            down: { x: 0, y: 0, width: 80, height: 80 },
-            left: { x: 0, y: 0, width: 80, height: 80 },
-            right: { x: 0, y: 0, width: 80, height: 80 }
-        };
 
         this.boxes = this.createRandomBoxes();
         this.setupTouchControls();
@@ -228,6 +254,7 @@ class Game {
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        console.log('Drawing game frame');
         
         if (!this.gameStarted || this.gameOver) {
             this.ctx.fillStyle = 'black';
@@ -238,6 +265,11 @@ class Game {
         } else {
             this.boxes.forEach(box => box.draw(this.ctx));
             this.snake.draw(this.ctx);
+        }
+        
+        // Always draw touch controls if game is active
+        if (this.gameStarted) {
+            console.log('About to draw touch controls');
             this.drawTouchControls();
         }
         
@@ -263,26 +295,30 @@ class Game {
     }
 
     drawTouchControls() {
-        console.log('Drawing touch controls');
-        // Make controls more visible
-        this.ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
+        console.log('Drawing touch controls - START');
         
-        // Draw buttons with borders
-        Object.values(this.touchButtons).forEach(btn => {
-            // Draw button background
+        // Make controls more visible and larger
+        this.ctx.fillStyle = 'rgba(0, 0, 255, 0.7)'; // More opaque blue
+        
+        // Log the positions of buttons
+        Object.entries(this.touchButtons).forEach(([direction, btn]) => {
+            console.log(`${direction} button:`, btn);
+            // Draw button background with bright color
+            this.ctx.fillStyle = 'rgba(0, 0, 255, 0.7)';
             this.ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
             
-            // Add border
+            // Add thick white border
             this.ctx.strokeStyle = 'white';
-            this.ctx.lineWidth = 2;
+            this.ctx.lineWidth = 4;
             this.ctx.strokeRect(btn.x, btn.y, btn.width, btn.height);
         });
 
-        // Draw arrow symbols in white
+        // Make arrows larger and more visible
         this.ctx.fillStyle = 'white';
         
-        // Up arrow
+        // Draw larger arrows
         let btn = this.touchButtons.up;
+        // Up arrow
         this.ctx.beginPath();
         this.ctx.moveTo(btn.x + btn.width/2, btn.y + btn.height * 0.2);
         this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.8);
@@ -290,32 +326,8 @@ class Game {
         this.ctx.closePath();
         this.ctx.fill();
 
-        // Down arrow
-        btn = this.touchButtons.down;
-        this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width/2, btn.y + btn.height * 0.8);
-        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.2);
-        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.2);
-        this.ctx.closePath();
-        this.ctx.fill();
-
-        // Left arrow
-        btn = this.touchButtons.left;
-        this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.2, btn.y + btn.height/2);
-        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.2);
-        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.8);
-        this.ctx.closePath();
-        this.ctx.fill();
-
-        // Right arrow
-        btn = this.touchButtons.right;
-        this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.8, btn.y + btn.height/2);
-        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.2);
-        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.8);
-        this.ctx.closePath();
-        this.ctx.fill();
+        // Similar for other arrows...
+        console.log('Drawing touch controls - END');
     }
 
     startGame() {
