@@ -71,9 +71,9 @@ class Game {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
         
-        // Initialize touch buttons with fixed positions and larger size
-        const buttonSize = 120; // Even larger buttons
-        const bottomPadding = 200;
+        // Initialize touch buttons with smaller size
+        const buttonSize = 60;  // Reduced from 120
+        const bottomPadding = 100;  // Reduced from 200
         
         this.touchButtons = {
             up: { 
@@ -84,7 +84,7 @@ class Game {
             },
             down: { 
                 x: this.canvas.width / 2 - buttonSize/2, 
-                y: this.canvas.height - buttonSize - 20, 
+                y: this.canvas.height - buttonSize - 10, // Reduced padding
                 width: buttonSize, 
                 height: buttonSize 
             },
@@ -236,6 +236,24 @@ class Game {
                 if (this.isPointInButton(x, y, this.touchButtons.right)) {
                     this.snake.direction = { x: 1, y: 0 };
                     this.snake.speed = this.snake.baseSpeed * 3;
+                }
+            }
+
+            if (this.won) {
+                // Check for Next/Play Again button touch
+                const buttonY = this.canvas.height / 2 + 60;
+                if (y > buttonY - 30 && y < buttonY + 30 &&
+                    x > this.canvas.width / 2 - 70 && x < this.canvas.width / 2 + 70) {
+                    if (this.currentSentenceIndex < this.sentences.length - 1) {
+                        this.currentSentenceIndex++;
+                        this.words = this.sentences[this.currentSentenceIndex];
+                        this.reset();
+                    } else {
+                        this.currentSentenceIndex = 0;
+                        this.words = this.sentences[this.currentSentenceIndex];
+                        this.reset();
+                    }
+                    return;
                 }
             }
         });

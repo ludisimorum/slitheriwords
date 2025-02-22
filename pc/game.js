@@ -40,8 +40,12 @@ class WordBox {
         this.word = word;
         this.x = x;
         this.y = y;
-        this.width = 320;
-        this.height = 160;
+        // Calculate width based on word length (approximate)
+        const ctx = document.getElementById('gameCanvas').getContext('2d');
+        ctx.font = '24px Arial';  // Same as draw font
+        const textWidth = ctx.measureText(word).width;
+        this.width = textWidth + 40;  // Add padding
+        this.height = 50;  // Enough height for text plus padding
         this.isCollected = false;
     }
 
@@ -100,14 +104,14 @@ class Game {
     createRandomBoxes() {
         const boxes = [];
         const shuffledWords = [...this.words].sort(() => Math.random() - 0.5);
-        const tryX = () => 50 + Math.random() * (this.canvas.width - 370);
+        const tryX = () => 50 + Math.random() * (this.canvas.width - 200);
         const minY = 50;
-        const maxY = this.canvas.height - 210;
+        const maxY = this.canvas.height - 100;
         const tryY = () => minY + Math.random() * (maxY - minY);
         const tryPosition = () => ({ x: tryX(), y: tryY() });
         
         const isTooClose = (pos, existingBoxes) => {
-            const minDistance = 400;
+            const minDistance = 100;  // Reduced from 400 since boxes are smaller
             return existingBoxes.some(box => {
                 const distance = Math.sqrt(
                     Math.pow(pos.x - box.x, 2) + Math.pow(pos.y - box.y, 2)
