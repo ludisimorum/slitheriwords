@@ -50,9 +50,9 @@ class WordBox {
             ctx.fillStyle = '#D2B48C';
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = 'black';
-            ctx.font = '32px Arial';
+            ctx.font = '64px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 12);
+            ctx.fillText(this.word, this.x + this.width / 2, this.y + this.height / 2 + 24);
         }
     }
 
@@ -136,19 +136,19 @@ class Game {
             switch (e.key) {
                 case 'ArrowUp':
                     this.snake.direction = { x: 0, y: -1 };
-                    this.snake.speed = this.snake.baseSpeed * 6;
+                    this.snake.speed = this.snake.baseSpeed * 10;
                     break;
                 case 'ArrowDown':
                     this.snake.direction = { x: 0, y: 1 };
-                    this.snake.speed = this.snake.baseSpeed * 6;
+                    this.snake.speed = this.snake.baseSpeed * 10;
                     break;
                 case 'ArrowLeft':
                     this.snake.direction = { x: -1, y: 0 };
-                    this.snake.speed = this.snake.baseSpeed * 6;
+                    this.snake.speed = this.snake.baseSpeed * 10;
                     break;
                 case 'ArrowRight':
                     this.snake.direction = { x: 1, y: 0 };
-                    this.snake.speed = this.snake.baseSpeed * 6;
+                    this.snake.speed = this.snake.baseSpeed * 10;
                     break;
                 case 'Enter':
                     if (!this.gameStarted || this.gameOver) {
@@ -211,7 +211,7 @@ class Game {
         
         if (!this.gameStarted || this.gameOver) {
             this.ctx.fillStyle = 'black';
-            this.ctx.font = 'bold 40px Arial';
+            this.ctx.font = 'bold 80px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText(this.words.join(' '), this.canvas.width / 2, 100);
             this.drawButton("Let's go!", this.canvas.width / 2, 200, 120, 40, 'blue');
@@ -224,7 +224,7 @@ class Game {
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = 'green';
-            this.ctx.font = '56px Arial';
+            this.ctx.font = '112px Arial';
             this.ctx.textAlign = 'center';
             this.ctx.fillText('You Won!', this.canvas.width / 2, this.canvas.height / 2);
             const buttonText = this.currentSentenceIndex < this.sentences.length - 1 ? 'Next?' : 'Play Again';
@@ -236,9 +236,9 @@ class Game {
         this.ctx.fillStyle = color;
         this.ctx.fillRect(x - width / 2, y - height / 2, width, height);
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '32px Arial';
+        this.ctx.font = '64px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(text, x, y + 12);
+        this.ctx.fillText(text, x, y + 24);
     }
 
     startGame() {
