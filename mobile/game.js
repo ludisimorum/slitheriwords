@@ -316,9 +316,8 @@ class Game {
         // Make arrows larger and more visible
         this.ctx.fillStyle = 'white';
         
-        // Draw larger arrows
-        let btn = this.touchButtons.up;
         // Up arrow
+        let btn = this.touchButtons.up;
         this.ctx.beginPath();
         this.ctx.moveTo(btn.x + btn.width/2, btn.y + btn.height * 0.2);
         this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.8);
@@ -326,7 +325,33 @@ class Game {
         this.ctx.closePath();
         this.ctx.fill();
 
-        // Similar for other arrows...
+        // Down arrow
+        btn = this.touchButtons.down;
+        this.ctx.beginPath();
+        this.ctx.moveTo(btn.x + btn.width/2, btn.y + btn.height * 0.8);
+        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.2);
+        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.2);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Left arrow
+        btn = this.touchButtons.left;
+        this.ctx.beginPath();
+        this.ctx.moveTo(btn.x + btn.width * 0.2, btn.y + btn.height/2);
+        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.2);
+        this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.8);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // Right arrow
+        btn = this.touchButtons.right;
+        this.ctx.beginPath();
+        this.ctx.moveTo(btn.x + btn.width * 0.8, btn.y + btn.height/2);
+        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.2);
+        this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.8);
+        this.ctx.closePath();
+        this.ctx.fill();
+
         console.log('Drawing touch controls - END');
     }
 
