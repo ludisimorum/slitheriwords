@@ -34,10 +34,10 @@
                 
                 if (isMobile) {
                     console.log("Redirecting to mobile version");
-                    window.location.href = './mobile/mobile.html';
+                    window.location.href = '/slitheriwords/mobile/mobile.html';
                 } else {
                     console.log("Redirecting to PC version");
-                    window.location.href = './pc/pc.html';
+                    window.location.href = '/slitheriwords/pc/pc.html';
                 }
             } catch (error) {
                 console.error('Redirect failed:', error);
@@ -47,11 +47,11 @@
 
         // Manual redirect functions
         function goToPC() {
-            window.location.href = './pc/pc.html';
+            window.location.href = '/slitheriwords/pc/pc.html';
         }
 
         function goToMobile() {
-            window.location.href = './mobile/mobile.html';
+            window.location.href = '/slitheriwords/mobile/mobile.html';
         }
     </script>
 </head>

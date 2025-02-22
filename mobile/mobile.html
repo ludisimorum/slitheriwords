@@ -20,15 +20,30 @@
             touch-action: none;
             position: absolute;
         }
+        #mobileIndicator {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: red;
+            color: white;
+            padding: 5px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
+    <div id="mobileIndicator">MOBILE VERSION</div>
     <canvas id="gameCanvas"></canvas>
     <script>
         // Prevent default touch behavior
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
+
+        // Add alert to verify script is running
+        window.onload = function() {
+            alert("Mobile version loaded");
+        }
     </script>
     <script src="game.js"></script>
 </body>
