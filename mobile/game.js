@@ -104,13 +104,35 @@ class Game {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         
-        // Update touch buttons positions
-        const bottomPadding = 150;
+        // Adjust control positions for better visibility and touch
+        const bottomPadding = 200; // Increased from 150
+        const buttonSize = 100; // Increased from 80
+        
         this.touchButtons = {
-            up: { x: this.canvas.width / 2 - 40, y: this.canvas.height - bottomPadding + 10, width: 80, height: 80 },
-            down: { x: this.canvas.width / 2 - 40, y: this.canvas.height - 90, width: 80, height: 80 },
-            left: { x: this.canvas.width / 2 - 130, y: this.canvas.height - bottomPadding + 60, width: 80, height: 80 },
-            right: { x: this.canvas.width / 2 + 50, y: this.canvas.height - bottomPadding + 60, width: 80, height: 80 }
+            up: { 
+                x: this.canvas.width / 2 - buttonSize/2, 
+                y: this.canvas.height - bottomPadding, 
+                width: buttonSize, 
+                height: buttonSize 
+            },
+            down: { 
+                x: this.canvas.width / 2 - buttonSize/2, 
+                y: this.canvas.height - buttonSize, 
+                width: buttonSize, 
+                height: buttonSize 
+            },
+            left: { 
+                x: this.canvas.width / 2 - buttonSize * 1.5, 
+                y: this.canvas.height - bottomPadding + buttonSize/2, 
+                width: buttonSize, 
+                height: buttonSize 
+            },
+            right: { 
+                x: this.canvas.width / 2 + buttonSize/2, 
+                y: this.canvas.height - bottomPadding + buttonSize/2, 
+                width: buttonSize, 
+                height: buttonSize 
+            }
         };
     }
 
@@ -210,6 +232,7 @@ class Game {
         } else {
             this.boxes.forEach(box => box.draw(this.ctx));
             this.snake.draw(this.ctx);
+            this.drawTouchControls();
         }
         
         if (this.won) {
@@ -221,10 +244,6 @@ class Game {
             this.ctx.fillText('You Won!', this.canvas.width / 2, this.canvas.height / 2);
             const buttonText = this.currentSentenceIndex < this.sentences.length - 1 ? 'Next?' : 'Play Again';
             this.drawButton(buttonText, this.canvas.width / 2, this.canvas.height / 2 + 60, 140, 60, 'blue');
-        }
-
-        if (this.gameStarted && !this.gameOver && !this.won) {
-            this.drawTouchControls();
         }
     }
 
@@ -238,22 +257,28 @@ class Game {
     }
 
     drawTouchControls() {
-        this.ctx.fillStyle = 'rgba(0, 0, 255, 0.3)';
+        console.log('Drawing touch controls');
+        // Make controls more visible
+        this.ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
         
-        // Draw arrows
+        // Draw buttons with borders
         Object.values(this.touchButtons).forEach(btn => {
+            // Draw button background
             this.ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
+            
+            // Add border
+            this.ctx.strokeStyle = 'white';
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeRect(btn.x, btn.y, btn.width, btn.height);
         });
 
-        // Draw arrow symbols
+        // Draw arrow symbols in white
         this.ctx.fillStyle = 'white';
-        this.ctx.strokeStyle = 'white';
-        this.ctx.lineWidth = 3;
-
+        
         // Up arrow
         let btn = this.touchButtons.up;
         this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.5, btn.y + btn.height * 0.2);
+        this.ctx.moveTo(btn.x + btn.width/2, btn.y + btn.height * 0.2);
         this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.8);
         this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.8);
         this.ctx.closePath();
@@ -262,7 +287,7 @@ class Game {
         // Down arrow
         btn = this.touchButtons.down;
         this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.5, btn.y + btn.height * 0.8);
+        this.ctx.moveTo(btn.x + btn.width/2, btn.y + btn.height * 0.8);
         this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.2);
         this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.2);
         this.ctx.closePath();
@@ -271,7 +296,7 @@ class Game {
         // Left arrow
         btn = this.touchButtons.left;
         this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.5);
+        this.ctx.moveTo(btn.x + btn.width * 0.2, btn.y + btn.height/2);
         this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.2);
         this.ctx.lineTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.8);
         this.ctx.closePath();
@@ -280,7 +305,7 @@ class Game {
         // Right arrow
         btn = this.touchButtons.right;
         this.ctx.beginPath();
-        this.ctx.moveTo(btn.x + btn.width * 0.8, btn.y + btn.height * 0.5);
+        this.ctx.moveTo(btn.x + btn.width * 0.8, btn.y + btn.height/2);
         this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.2);
         this.ctx.lineTo(btn.x + btn.width * 0.2, btn.y + btn.height * 0.8);
         this.ctx.closePath();
