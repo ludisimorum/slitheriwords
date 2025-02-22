@@ -40,8 +40,8 @@ class WordBox {
         this.word = word;
         this.x = x;
         this.y = y;
-        this.width = 80;
-        this.height = 40;
+        this.width = 320;
+        this.height = 160;
         this.isCollected = false;
     }
 
@@ -100,14 +100,14 @@ class Game {
     createRandomBoxes() {
         const boxes = [];
         const shuffledWords = [...this.words].sort(() => Math.random() - 0.5);
-        const tryX = () => 50 + Math.random() * (this.canvas.width - 180);
+        const tryX = () => 50 + Math.random() * (this.canvas.width - 370);
         const minY = 50;
-        const maxY = this.canvas.height - 90;
+        const maxY = this.canvas.height - 210;
         const tryY = () => minY + Math.random() * (maxY - minY);
         const tryPosition = () => ({ x: tryX(), y: tryY() });
         
         const isTooClose = (pos, existingBoxes) => {
-            const minDistance = 120;
+            const minDistance = 400;
             return existingBoxes.some(box => {
                 const distance = Math.sqrt(
                     Math.pow(pos.x - box.x, 2) + Math.pow(pos.y - box.y, 2)
@@ -136,19 +136,19 @@ class Game {
             switch (e.key) {
                 case 'ArrowUp':
                     this.snake.direction = { x: 0, y: -1 };
-                    this.snake.speed = this.snake.baseSpeed * 10;
+                    this.snake.speed = this.snake.baseSpeed * 20;
                     break;
                 case 'ArrowDown':
                     this.snake.direction = { x: 0, y: 1 };
-                    this.snake.speed = this.snake.baseSpeed * 10;
+                    this.snake.speed = this.snake.baseSpeed * 20;
                     break;
                 case 'ArrowLeft':
                     this.snake.direction = { x: -1, y: 0 };
-                    this.snake.speed = this.snake.baseSpeed * 10;
+                    this.snake.speed = this.snake.baseSpeed * 20;
                     break;
                 case 'ArrowRight':
                     this.snake.direction = { x: 1, y: 0 };
-                    this.snake.speed = this.snake.baseSpeed * 10;
+                    this.snake.speed = this.snake.baseSpeed * 20;
                     break;
                 case 'Enter':
                     if (!this.gameStarted || this.gameOver) {
